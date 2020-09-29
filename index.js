@@ -1,28 +1,33 @@
 //randomly draw 
 let r = 15; //r is radius of circle
-let randomNumber;
-let clicks = 3;
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext('2d');
-const startBtn = document.querySelector("#start");
 
-const msg = document.querySelector("#message");
-
-startBtn.addEventListener("click", resetGame);
-
-
+const startBtn = document.getElementById("start");
+const msg = document.getElementById("message");
 const answer = document.getElementById("answer");
 const allNumbers = answer.childNodes;
-
+//answer.addEventListener("click", compareResult);
 const tries = document.getElementById("tries");
-const ladybug = document.querySelector("#background");
+let box = document.querySelectorAll("div.box");
+const ladybug = document.getElementById("background");
+//const colors = ["salmon", "green", "grey", "black", "#344ceb", "#eb34cf", "34e2eb", "yellow",
+//    "orange", "brown", "aqua", "#34eb93", "#34eb4c", "#7deb34"];
+startBtn.addEventListener("click", resetGame);
+//checkBtn.addEventListener("click", compareResult);
+
+let randomNumber;
+let clicks = 3;
+
 
 
 function drawCircles() {
     
+
     randomNumber = getRandomNumber();
- 
+    
+   
     let protection = 0;
     let drawnCircles = [];
     
@@ -43,18 +48,20 @@ function drawCircles() {
             for(let j = 0; j<drawnCircles.length; j++){
                 let existing = drawnCircles[j];
                 
-                let d = dist(existing.x, existing.y, proposal.x, proposal.y);
+               let d = dist(existing.x, existing.y, proposal.x, proposal.y);
               
               
                  if (d < existing.r+proposal.r) {
                     overlapping = true;
                     break;
-                    }        
+                    }
+                    
             }
            
         if (!overlapping) {
             drawnCircles.push(proposal);
            
+            //let color = colors[Math.floor(Math.random() * colors.length)];
             ctx.beginPath();
             ctx.arc(proposal.x, proposal.y, proposal.r, 0, 2 * Math.PI);
             ctx.fillStyle = "yellow";
@@ -64,7 +71,9 @@ function drawCircles() {
 
         if (protection > 5000) {
             break;
-        }  
+        }
+
+       
     }
 
 }
@@ -81,14 +90,16 @@ function clearCanvas() {
 function resetGame() {
     answer.addEventListener("click", compareResult);
     msg.classList.add('hidden');
+    tries.classList.remove('hidden');
     ladybug.classList.remove("win");
     clearCanvas();
     clicks = 3;
     tries.innerText = `Tries left: ${clicks}`;
     drawCircles();
     removeClass();
-}
 
+
+}
 
 function randomCoordinates() {
     const width = canvas.width;
@@ -107,7 +118,7 @@ function randomCoordinates() {
 
 function getRandomNumber() {
     randomNumber = Math.floor(Math.random() * 10 + 1);
-   
+    // theRandomNumber = randomNumber;
     return randomNumber;
 }
 
@@ -118,45 +129,42 @@ function compareResult() {
 
     let value = parseInt(element.innerHTML);
  
-    if(clicks >= 1) {
-        checkValues(value);
+    if(value != randomNumber){
         clicks--;
-        tries.innerText = `Tries left: ${clicks}`;
-    }
-
-    if(clicks == 0) {
-        msg.innerHTML = "End game";
-        answer.removeEventListener("click", compareResult);
-    }
-
-}
-
-
-
-function checkValues(value) {
-
-    msg.classList.add('hidden');
-    if (value === randomNumber) {
         msg.classList.remove('hidden');
-        msg.innerHTML = "Great!<br> Click on start button for a new game";
-        answer.removeEventListener("click", compareResult);
-
-        ladybug.classList.add("win");
-
-        clearCanvas();
-        animateDivs();
+        tries.innerText = `Tries left: ${clicks}`;
+        msg.innerHTML = "Wrong! Try again!";
+        
+        if(clicks === 0) {
+            msg.innerHTML = "End game";
+            answer.removeEventListener("click", compareResult);
+        }
     }
+
     else {
         msg.classList.remove('hidden');
-        msg.innerHTML = "Wrong! Try again!";
+        msg.innerHTML = "Great!<br> Click on start button for a new game";
+        tries.classList.add('hidden');
+        answer.removeEventListener("click", compareResult);
+
+        startAnimation();
     }
+    
+
 }
 
+
+
+
+
 function startAnimation() {
-   
+    
+ 
+
     ladybug.classList.add("win");
   
     animateDivs();
+
     clearCanvas();
 
 
@@ -164,23 +172,27 @@ function startAnimation() {
 
 function animateDivs() {
 
-    let box = document.querySelectorAll("div.box");
+   
     for (let i = 0; i < box.length; i++) {
         setTimeout(function () {
-            box[i].classList.add("light")
+            box[i].classList.add("win")
         }, 50 * i);
     }
 }
-
 function removeClass() {
-    let box = document.querySelectorAll("div.box");
+    
     for (let i = 0; i < box.length; i++) {
-          box[i].classList.remove("light");
-     
+        //setTimeout(function(){
+        box[i].classList.remove("win");
+        //},50*i);
     }
 }
+
+
 
 
 function dist(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow((x2 - x1),2) + Math.pow((y2 - y1),2));
 }
+
+
